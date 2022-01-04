@@ -1,0 +1,147 @@
+使用的操作系统是是centos6.5，按照官方的推荐的配置，把linux内核升级到3.8以上。安装步骤如下:
+
+1、升级内核版本（包含aufs）
+cd /etc/yum.repos.d
+wget http://www.hop5.in/yum/el6/hop5.repo
+yum install kernel-ml-aufs kernel-ml-aufs-devel
+
+2、修改引导的内核
+vi /etc/grub.conf
+把默认的引导文件设置为0。因为升级内核之后，新的内核在第一个（0）位置。
+
+3、重启系统，使用新的内核
+#检查内核版本：
+uname  -r
+3.10.5-3.el6.x86_64
+#检查aufs是否存在
+grep aufs /proc/filesystems
+nodev     aufs
+
+4、安装相应的epel源
+wget http://ftp.riken.jp/Linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm
+rpm -ivh  epel-release-6-8.noarch.rpm
+
+5、安装docker
+yum -y install docker-io
+
+6、启动docker
+启动docker进程：service docker start
+查看docker进程：ps -ef |grep docker
+root      1878     1  0 18:33 ?        00:00:00 /usr/bin/docker -d
+root      2307  2201  0 18:52 pts/0    00:00:00 grep docker
+
+7、Docker常用命令讲解
+docker  version #查看版本
+docker  search centos#搜索可用docker镜像
+docker  images 查看当前docker所有镜像
+docker  pull  centos #下载镜像
+cat   centos.tar | docker import  -  centos6  #Docker导入镜像
+docker  export  id  > cenos6.tar  #Docker导出镜像
+docker  run   centos echo "hello word"#在docker容器中运行hello world!
+docker  run  centos yum install ntpdate#在容器中安装ntpdate的程序
+docker  ps -l 命令获得最后一个容器的id，docker   ps  -a查看所有的容器。
+运行docker commit 提交刚修改的容器，例如：
+docker  commit  2313132  centos:v1
+docker run -i -t centos /bin/bash 在容器里启动一个/bin/bash shell环境，可以登录进入操作，其中-t 表示打开一个终端的意思，-i表示可以交互输入。
+docker run -d -i -t centos /bin/bash 在后台启动
+docker attach CONTAINER ID 进入在后台启动后的这个容器
+docker  run  -d  centos:v1  /bin/bash  ,-d表示在后台启动，以daemon方式启动。
+docker run -d -p 80:80 -p 8022:22 centos:latest /usr/bin/sshd -D
+docker stop  id 关闭容器
+docker start  id 启动某个容器
+docker  rm  id 删除容器，docker  rmi  images删除镜像
+进入容器:
+如果 docker 版本已经在 1.3 以上了, 那么可以用 docker exec 这个命令:
+docker exec -it <CONTAINER ID> /bin/bash             /这样你就进到这个container 里面了，这个bash退出也不会影响之前 docker run 启动的 bash/
+
+
+8、Docker独立IP及容器互联
+service docker stop
+ifconfig docker0 down
+brctl delbr docker0
+cd /etc/sysconfig/network-scripts/
+
+vi ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=none
+ONBOOT=yes
+TYPE=Ethernet
+BRIDGE="br0"
+BOOTPROTO=static
+
+vi ifcfg-br0
+DEVICE="br0"
+ONBOOT=yes
+NM_CONTROLLED=no
+BOOTPROTO=static
+TYPE=bridge
+IPADDR=192.168.1.165
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+DNS=192.168.1.50
+
+vi /etc/sysconfig/docker
+other_args="-b=br0"
+
+service docker start
+[root@localhost ~]# ps -ef|grep docker
+root      5502     1  0 01:23 pts/3    00:00:00 /usr/bin/docker -d -b=br0
+root      5800  5311  0 01:47 pts/3    00:00:00 grep docker
+
+service network restart
+可能会报以下错误：
+Shutting down interface eth0:                              [  OK  ]
+Shutting down loopback interface:                          [  OK  ]
+Bringing up loopback interface:                            [  OK  ]
+Bringing up interface br0:  Determining if ip address 192.168.1.161 is already in use for device br0...
+                                                           [  OK  ]
+Bringing up interface eth0:  Error: Connection activation failed: Master connection not found or invalid
+                                                           [FAILED]
+解决方法：
+此时，当前网卡也是可以通信的，但是通过网络管理工具修改IP之后，当前修改操作是不会生效的。那如何消除这个提示呢？
+其实，问题的原因是RedHat自己开发的NetworkManager管理工具和/etc/sysconfig/network-scripts/ifcfg-ethx配置不同步造成的。如果要消除这个提示，请关闭NetworkManager服务即可：
+chkconfig NetworkManager off
+service NetworkManager stop
+Stopping NetworkManager daemon:                            [  OK  ]
+此时，再重新加载network服务即可：
+service network restart
+Shutting down interface br0:                               [  OK  ]
+Shutting down loopback interface:                          [  OK  ]
+Bringing up loopback interface:                            [  OK  ]
+Bringing up interface br0:  Determining if ip address 192.168.1.161 is already in use for device br0...
+                                                           [  OK  ]
+Bringing up interface eth0:  device eth0 is already a member of a bridge; can't enslave it to bridge br0.
+                                                           [  OK  ]
+
+
+
+9、为容器手动配置静态ip
+安装新的 iproute 包:
+wget https://repos.fedorapeople.org/repos/openstack/openstack-icehouse/epel-6/iproute-2.6.32-130.el6ost.netns.2.x86_64.rpm
+yum localinstall iproute-2.6.32-130.el6ost.netns.2.x86_64.rpm
+
+安装pipework:
+git clone https://github.com/jpetazzo/pipework
+cp ~/pipework/pipework /usr/local/bin/
+启动Docker容器:
+docker run -itd --net=none jdeathe/centos-ssh:latest /bin/bash
+
+docker exec -it <CONTAINER ID> /bin/bash  /这样你就进到这个container 里面了，这个bash退出也不会影响之前 docker run 启动的 bash/
+
+pipework br0 <CONTAINER ID> 192.168.1.170/24@192.168.1.1
+
+10、制作可以ssh登录的本地Docker镜像
+安装制作CentOS镜像的工具：
+yum -y install febootstrap
+
+制作CentOS镜像文件centos6-image目录：
+febootstrap -i bash -i wget -i yum -i iputils -i iproute -i man -i vim-minimal -i openssh-server -i openssh-clients centos6 centos6-image http://mirrors.aliyun.com/centos/6/os/x86_64/
+
+制作Docker镜像，镜像名字是centos6-base：
+cd centos6-image && tar -c .|docker import - centos6-base
+
+制作可以ssh登陆的Docker镜像，名字是centos6-ssh：
+docker build -t centos6-ssh https://git.oschina.net/feedao/Docker_shell/raw/start/Dockerfile
+
+经过前面的六个步骤，一个可以登陆的本地docker镜像就制作好了。
+用户名是：root，密码是：123456
