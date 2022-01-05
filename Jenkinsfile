@@ -32,7 +32,7 @@ pipeline {
             }
         }
 
-        stage("maven package") {
+        stage("maven deploy") {
             steps {
                 timeout(time: 60, unit: 'SECONDS') {
                     input 'Do you want to proceed to the Deployment?'
