@@ -34,7 +34,7 @@ pipeline {
 
         stage("maven deploy") {
             steps {
-                timeout(time: 60, unit: 'SECONDS') {
+                timeout(time: 48, unit: 'HOURS') {
                     input 'Do you want to proceed to the Deployment?'
                 }
                 echo "commend: mvn clean deploy"
