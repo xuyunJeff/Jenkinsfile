@@ -32,10 +32,18 @@ pipeline {
             stage("maven package"){
                 steps {
                      echo "commend: mvn clean package"
-                     sh '''
-                        mvn clean package
-                        '''
-                     }
+                     sh 'mvn clean package -DskipTests'
+                }
+            }
+
+            stage("maven package"){
+                steps {
+                       timeout(time: 60, unit: 'SECONDS') {
+                                 input 'Do you want to proceed to the Deployment?'
+                       }
+                       echo "commend: mvn clean deploy"
+                       sh 'mvn clean deploy -DskipTests'
+                }
             }
 
         }
