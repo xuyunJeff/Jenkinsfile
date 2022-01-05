@@ -12,16 +12,12 @@ pipeline {
     tools {
         maven "maven3.8.4"
     }
-
     stages {
-
         stage("maven check") {
             steps {
                 echo "commend: mvn -v"
                 sh 'mvn -v'
-
             }
-
         }
         stage("checkout branches") {
             steps {
