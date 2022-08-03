@@ -1,0 +1,10 @@
+
+
+
+签名
+jarsigner -keystore fangyuan.keystore chu-nian-4.1.6/dist/chu-nian-4.1.6.apk fangyuan
+会在当前目录：  fangyuan.keystore
+
+
+检测签名是否合法
+keytool -printcert -jarfile chu-nian-4.1.6/dist/chu-nian-4.1.6.apk

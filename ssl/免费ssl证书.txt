@@ -1,0 +1,42 @@
+amazon linux
+
+sudo amazon-linux-extras install epel -y
+
+sudo yum install certbot -y
+
+certbot --version
+
+
+申请通配符证书命令如下
+
+sudo letsencrypt certonly --webroot -w /home/ec2-user/www/supervideo -d supervideo.com -d *.supervideo.com
+生成的域名保存在目录：/etc/letsencrypt/live/blog.xxx.org/中:
+
+ cert.pem: 域名证书
+ chain.pem: Let's Encrypt chain 证书
+ fullchain.pem: cert.pem 和 chain.pem 组合证书
+ privkey.pem: 证书私钥
+
+
+sudo certbot certonly -d yourdomain.com -d *.yourdomain.com  --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory
+
+sudo certbot certonly -d supervideo.link -d *.supervideo.link --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory
+
+sudo certbot certonly -d supervideo.link --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory
+
+
+1 certonly 是 certbot 众多插件之一，您可以选择其他插件。
+
+2 -d 为那些主机申请证书，如果是通配符，输入 *.yourdomain.com。
+  注意：本文还申请了 yourdomain.com 这是为了避免通配符证书不匹配。
+
+3 –preferred-challenges dns，使用 DNS 方式校验域名所有权。
+注意：通配符证书只能使用 dns-01 这种方式申请。
+
+查看证书
+
+ cd /etc/letsencrypt/
+ ls
+
+校验一下证书信息
+sudo openssl x509 -in /etc/letsencrypt/live/supervideo.com/cert.pem -noout -text

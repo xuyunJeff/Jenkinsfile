@@ -1,0 +1,61 @@
+$ apktool d bar.apk
+$ apktool decode bar.apk
+// 效果一样 反编译 bar.apk 并将其解压到 bar 目录
+
+apktool d bar.apk
+apktool b F:\document\app F:\\document\\app.apk
+
+地址： https://www.i4k.xyz/article/hmily65/108074554
+1 修改AndroidManifest.xml 的包名
+   com.zte.homemedia，将所有com.dangbei.tvlauncher替换成com.zte.homemedia
+
+2 将文件里的
+  将所有Lcom/dangbei/tvlauncher替换成Lcom/zte/homemedia
+3  com/dangbei替换成Lcom/zte
+
+
+4.需要删除原有的apk签名，去apk的 META－INF 文件夹中删除 *.RSA、*.SF(除MANIFEST.MF)的文件
+
+chmod +x
+
+
+com.asdlfkjlwer.reoqc
+
+修改包名实现分身
+https://blog.csdn.net/YJJYXM/article/details/108822671?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-108822671-blog-117964623.pc_relevant_multi_platform_whitelistv3&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-108822671-blog-117964623.pc_relevant_multi_platform_whitelistv3&utm_relevant_index=1
+
+1 ~/chu-nian-4.1.6/res/values/strings.xml  修改 appName
+
+
+
+1、将apk解包成一个文件夹
+
+2、修改AndroidManifest.xml中对应的包名
+       将package后面的包名com.tencent.qbx改为你想要的新包名，我改为了com.tianxiao.tencentweb
+
+        将涉及原包名的com.tencent.qbx的相关activity的声明中的包名均改为新包名com.tianxiao.tencentweb
+
+   　  至于intent-filter里面的action名中包含原包名的，则可以不改，如果改的话，代码中也要相应的改变
+
+        另外，如果有provider，provider的authorities也得改，这个在同一手机上必须唯一，否则安装会失败
+
+
+3、修改smali目录下中的包
+    有很多子目录，子目录下的文件多以smali结尾，这中文件的语法有点类似于汇编语言，具体原理就不深究了。
+
+    　  将smali目录下的所有文件中的原包名的声明形式com/tencent/qbx改为新包名com/tianxiao/tencentweb
+
+    　  具体如下，用UEdit在文件中替换即可，将目标目录指向E:\apkTool\qq4\smali，这个将近1000条左右
+
+         如果之前改为action里面的包名，也要将字符串形式的包名com.tencent.qbx改为com.tianxiao.tencentweb
+
+         如果有provider也要讲原来的authorities值改为在AndroidManifest.xml中新改的authorities值。
+4、将文件夹打包成apk
+
+5、将apk重新签名
+
+6、验证apk的签名
+
+7、优化apk
+
+8、安装apk，并测试
