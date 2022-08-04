@@ -1,8 +1,11 @@
 docker pull mysql:5.7.39
 
-sudo mkdir /data
-sudo mkdir /data/mysql
-sudo mkdir /data/mysql/data
+
+sudo mkdir ～/mysql
+sudo mkdir ～/mysql/data
 
 
-docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=qwer1234  -v /data/mysql/data:/var/lib/mysql -d mysql:5.7.39 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=qwer1234  -v ~/mysql/data:/var/lib/mysql -d mysql:5.7.39 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+安装mysql 客户端(已经安装了python)
+brew install mysql-client
