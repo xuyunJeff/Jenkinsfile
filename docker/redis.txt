@@ -4,4 +4,3 @@ mkdir ~/mysql
 
 docker run --name redis -p 6379:6379  -d redis
 
-docker run -v /myredis/conf:/usr/local/etc/redis  redis redis-server /usr/local/etc/redis/redis.conf
