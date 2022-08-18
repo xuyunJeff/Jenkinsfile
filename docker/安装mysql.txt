@@ -11,3 +11,7 @@ docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=qwer1234  -v ~/mysql
 brew install mysql-client
 
 docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=qwer1234  -v ~/mysql/data:/var/lib/mysql -d mysql:latest --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+mysql -h 172.26.68.53 -u root -pqwer1234
+
+默认数据库分类： information_schema performance_schema mysql test informance_schema 保存了MySQl服务所有数据库的信息

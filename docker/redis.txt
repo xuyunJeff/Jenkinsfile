@@ -13,3 +13,12 @@ docker run \
 -v ~/redis/redis/data:/data:rw \
 --privileged=true -d redis redis-server /etc/redis/redis.conf \
 --appendonly yes
+
+
+
+docker run \
+-p 6379:6379 --name redis \
+-v /root/redis/redis.conf:/etc/redis/redis.conf \
+-v /root/redis/data:/data:rw \
+--privileged=true -d redis redis-server /etc/redis/redis.conf \
+--appendonly yes
